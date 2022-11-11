@@ -10,7 +10,7 @@ import arpa
 import random
 
 processor=Wav2Vec2Processor.from_pretrained('facebook/wav2vec2-base-10k-voxpopuli-ft-pl')
-model=Wav2Vec2ForCTC.from_pretrained('facebook/wav2vec2-base-10k-voxpopuli-ft-pl') #.to('cuda')
+model=Wav2Vec2ForCTC.from_pretrained('facebook/wav2vec2-base-10k-voxpopuli-ft-pl')
 
 files={}
 for f in Path('sanah').glob('*.wav'):
@@ -25,7 +25,7 @@ for name,d in files.items():
 
 trans={}
 for name,data in tqdm(files.items()):
-    feats=processor(data,sampling_rate=Fs,return_tensors='pt',padding=True) #.to('cuda')
+    feats=processor(data,sampling_rate=Fs,return_tensors='pt',padding=True)
     print(name, feats.input_values)
     out=model(input_values=feats.input_values)
     predicted_ids=torch.argmax(out.logits,dim=-1)
@@ -52,15 +52,4 @@ for name in trans.keys():
     r.append(ref[name])
 
 print(jiwer.compute_measures(r,h))
-
-digits=['zero','jeden','dwa','trzy','cztery','pięć','sześć','siedem','osiem','dziewięć']
-with open('digits.txt','w') as f:
-  for l in range(100):
-    f.write(' '.join([digits[x] for x in random.sample(range(0, 10), 10)])+'\n')
-
-
-tokens=[x[0] for x in sorted(processor.tokenizer.get_vocab().items(),key=lambda x:x[1])]
-print(tokens)
-tokens[4]=' '
-print(tokens)
 
